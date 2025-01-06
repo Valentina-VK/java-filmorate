@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.time.LocalDate;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -61,5 +62,13 @@ class UserTest {
         assertFalse(violation.isEmpty(), "Валидация прошла при дате рождения в будущем");
         user.setBirthday(null);
         assertFalse(violation.isEmpty(), "Валидация прошла при значении null");
+    }
+
+    @Test
+    void setNameAsLoginIfItIsEmptyOrNull() {
+        user.setName("");
+        assertEquals(user.getLogin(), user.getName(), "Имя не соответствует логину при пустом значении");
+        user.setName(null);
+        assertEquals(user.getLogin(), user.getName(), "Имя не соответствует логину при значении null");
     }
 }
