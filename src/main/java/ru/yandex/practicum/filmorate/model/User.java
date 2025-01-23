@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -9,6 +10,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(of = {"login", "email"})
@@ -23,6 +26,7 @@ public class User {
     private String name;
     @Past(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
+    private final Set<Long> friends = new HashSet<>();
 
     public void setLogin(String login) {
         this.login = login;
@@ -37,5 +41,14 @@ public class User {
         } else {
             this.name = name;
         }
+    }
+
+    public void addFriend(long friendId) {
+        if (friendId == this.id) throw new ValidationException("Id друга должен отличаться от id пользователя");
+        friends.add(friendId);
+    }
+
+    public void removeFriend(long friendId) {
+        friends.remove(friendId);
     }
 }
