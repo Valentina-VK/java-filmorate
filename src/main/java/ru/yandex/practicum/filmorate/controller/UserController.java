@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.dto.NewUserRequest;
+import ru.yandex.practicum.filmorate.dto.UpdateUserRequest;
+import ru.yandex.practicum.filmorate.dto.UserDto;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import java.util.List;
@@ -25,46 +27,46 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    public List<User> findAll() {
+    public List<UserDto> findAll() {
         return userService.getUsers();
     }
 
     @PostMapping
-    public User create(@Valid @RequestBody User user) {
+    public UserDto create(@Valid @RequestBody NewUserRequest user) {
         return userService.createUser(user);
     }
 
     @PutMapping
-    public User update(@Valid @RequestBody User newUser) {
+    public UserDto update(@Valid @RequestBody UpdateUserRequest newUser) {
         return userService.updateUser(newUser);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-    public User addFriend(@Positive(message = "Id пользователя должен быть положительным числом")
-                          @PathVariable("id") Long id,
-                          @Positive(message = "Id друга должен быть положительным числом")
-                          @PathVariable("friendId") Long friendId) {
+    public UserDto addFriend(@Positive(message = "Id пользователя должен быть положительным числом")
+                             @PathVariable("id") Long id,
+                             @Positive(message = "Id друга должен быть положительным числом")
+                             @PathVariable("friendId") Long friendId) {
         return userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
-    public User removeFromFriends(@Positive(message = "Id пользователя должен быть положительным числом")
-                                  @PathVariable("id") Long id,
-                                  @Positive(message = "Id друга должен быть положительным числом")
-                                  @PathVariable("friendId") Long friendId) {
+    public UserDto removeFromFriends(@Positive(message = "Id пользователя должен быть положительным числом")
+                                     @PathVariable("id") Long id,
+                                     @Positive(message = "Id друга должен быть положительным числом")
+                                     @PathVariable("friendId") Long friendId) {
         return userService.removeFromFriends(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
-    public List<User> getFriends(@Positive @PathVariable("id") Long id) {
+    public List<UserDto> getFriends(@Positive @PathVariable("id") Long id) {
         return userService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getCommonFriends(@Positive(message = "Id пользователя должен быть положительным числом")
-                                       @PathVariable("id") Long id,
-                                       @Positive(message = "Id пользователя должен быть положительным числом")
-                                       @PathVariable("otherId") Long otherId) {
+    public List<UserDto> getCommonFriends(@Positive(message = "Id пользователя должен быть положительным числом")
+                                          @PathVariable("id") Long id,
+                                          @Positive(message = "Id пользователя должен быть положительным числом")
+                                          @PathVariable("otherId") Long otherId) {
         return userService.getCommonFriends(id, otherId);
     }
 }

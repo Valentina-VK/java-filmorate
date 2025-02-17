@@ -49,6 +49,18 @@ public class InMemoryFilmStorage implements FilmStorage {
                 .orElseThrow(() -> new NotFoundException("Фильм не найден, id: " + id));
     }
 
+    @Override
+    public Film userLikesFilm(Long id, Long userId) {
+        getFilmById(id).addLike(userId);
+        return getFilmById(id);
+    }
+
+    @Override
+    public Film deleteLikesFilm(Long id, Long userId) {
+        getFilmById(id).removeLike(userId);
+        return getFilmById(id);
+    }
+
     private long getNextId() {
         long currentMaxId = films.keySet()
                 .stream()
