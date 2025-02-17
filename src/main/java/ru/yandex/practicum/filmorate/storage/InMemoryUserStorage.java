@@ -49,6 +49,36 @@ public class InMemoryUserStorage implements UserStorage {
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден, id: " + id));
     }
 
+    @Override
+    public User addFriend(long userId, long otherId) {
+        User user = getUserById(userId);
+        user.addFriend(otherId);
+        getUserById(otherId).addFriend(userId);
+        return user;
+    }
+
+    @Override
+    public User deleteFriend(long userId, long friendId) {
+        User user = getUserById(userId);
+        user.removeFriend(friendId);
+        getUserById(friendId).removeFriend(userId);
+        return user;
+    }
+
+    @Override
+    public List<User> listOfFriends(long id) {
+        return getUserById(id).getFriends().stream()
+                .map(this::getUserById)
+                .toList();
+    }
+
+    @Override
+    public List<User> listOfCommonFriends(Long id, Long otherId) {
+        List<User> commonFriends = listOfFriends(id);
+        listOfFriends(id).retainAll(listOfFriends(otherId));
+        return commonFriends;
+    }
+
     private long getNextId() {
         long currentMaxId = users.keySet()
                 .stream()
