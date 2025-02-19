@@ -7,12 +7,12 @@ import ru.yandex.practicum.filmorate.dto.NewFilmRequest;
 import ru.yandex.practicum.filmorate.dto.UpdateFilmRequest;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.HashSet;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class FilmMapper {
 
-    public static Film mapToFilm(NewFilmRequest request) {
+    public static Film toEntity(NewFilmRequest request) {
         Film film = new Film();
         film.setName(request.getName());
         film.setDescription(request.getDescription());
@@ -23,19 +23,25 @@ public class FilmMapper {
         return film;
     }
 
-    public static FilmDto mapToFilmDto(Film film) {
+    public static FilmDto toDto(Film film) {
         FilmDto dto = new FilmDto();
         dto.setId(film.getId());
         dto.setName(film.getName());
         dto.setDescription(film.getDescription());
         dto.setReleaseDate(film.getReleaseDate());
         dto.setDuration(film.getDuration());
-        dto.setMpa(film.getRatingMpa());
-        dto.setGenres(new HashSet<>(film.getGenres()));
+        dto.setMpa(RatingMpaMapper.toDto(film.getRatingMpa()));
+        dto.setGenres(GenreMapper.toDto(film.getGenres()));
         return dto;
     }
 
-    public static Film updateFilmFields(Film film, UpdateFilmRequest request) {
+    public static List<FilmDto> toDto(List<Film> films) {
+        return films.stream().map(FilmMapper::toDto).toList();
+    }
+
+    public static Film toEntity(UpdateFilmRequest request) {
+        Film film = new Film();
+        film.setId(request.getId());
         film.setName(request.getName());
         film.setDescription(request.getDescription());
         film.setReleaseDate(request.getReleaseDate());

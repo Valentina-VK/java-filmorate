@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +15,7 @@ import java.util.Set;
 @Data
 @EqualsAndHashCode(of = {"login", "email"})
 public class User {
-    private long id;
+    private Long id;
     @NotNull(message = "Email должен быть заполнен")
     @Email(message = "Email должен быть корректным")
     private String email;
@@ -41,14 +40,5 @@ public class User {
         } else {
             this.name = name;
         }
-    }
-
-    public void addFriend(long friendId) {
-        if (friendId == this.id) throw new ValidationException("Id друга должен отличаться от id пользователя");
-        friends.add(friendId);
-    }
-
-    public void removeFriend(long friendId) {
-        friends.remove(friendId);
     }
 }

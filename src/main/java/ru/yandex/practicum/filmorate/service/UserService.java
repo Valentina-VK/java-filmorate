@@ -20,39 +20,37 @@ public class UserService {
     }
 
     public List<UserDto> getUsers() {
-        return userStorage.getUsers().stream()
-                .map(UserMapper::mapToUserDto)
-                .toList();
+        return UserMapper.toDto(userStorage.getUsers());
+    }
+
+    public UserDto getUserById(long id) {
+        return UserMapper.toDto(userStorage.getUserById(id));
     }
 
     public UserDto createUser(NewUserRequest user) {
-        return UserMapper.mapToUserDto(userStorage.create(UserMapper.mapToUser(user)));
+        return UserMapper.toDto(userStorage.create(UserMapper.toEntity(user)));
     }
 
     public UserDto updateUser(UpdateUserRequest newUser) {
         User user = userStorage.getUserById(newUser.getId());
-        return UserMapper.mapToUserDto(UserMapper.updateUserFields(user, newUser));
+        return UserMapper.toDto(UserMapper.toEntity(user, newUser));
     }
 
     public UserDto addFriend(long id, long friendId) {
         User user = userStorage.addFriend(id, friendId);
-        return UserMapper.mapToUserDto(user);
+        return UserMapper.toDto(user);
     }
 
     public UserDto removeFromFriends(long id, long friendId) {
         User user = userStorage.deleteFriend(id, friendId);
-        return UserMapper.mapToUserDto(user);
+        return UserMapper.toDto(user);
     }
 
     public List<UserDto> getFriends(long id) {
-        return userStorage.listOfFriends(id).stream()
-                .map(UserMapper::mapToUserDto)
-                .toList();
+        return UserMapper.toDto(userStorage.listOfFriends(id));
     }
 
     public List<UserDto> getCommonFriends(long id, long otherId) {
-        return userStorage.listOfCommonFriends(id, otherId).stream()
-                .map(UserMapper::mapToUserDto)
-                .toList();
+        return UserMapper.toDto(userStorage.listOfCommonFriends(id, otherId));
     }
 }

@@ -27,6 +27,8 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     private static final String DELETE_USER_QUERY = "DELETE FROM users WHERE user_id = ? CASCADE";
     private static final String DELETE_FRIEND_QUERY = "DELETE FROM friendship WHERE (user_id = ? AND friend_id = ?) " +
             "OR (friend_id = ? AND user_id = ?)";
+    private static final String FRIENDS_QUERY = "SELECT f.friend_id FROM friendship AS f WHERE f.user_id = ? " +
+            "UNION SELECT fr.user_id FROM friendship AS fr WHERE fr.friend_id = ? AND status ='CONFIRMED'";
 
     public UserDbStorage(JdbcTemplate jdbc, RowMapper<User> mapper) {
         super(jdbc, mapper);
@@ -62,8 +64,12 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
     }
 
     public User getUserById(long userId) {
-        return findOne(FIND_USER_BY_ID_QUERY, userId)
+        User user = findOne(FIND_USER_BY_ID_QUERY, userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь не найден, id: " + userId));
+        List<Long> friendsId = jdbc.queryForList(FRIENDS_QUERY, Long.class, user.getId(), user.getId());
+        if (!friendsId.isEmpty())
+            user.setFriends(Set.copyOf(friendsId));
+        return user;
     }
 
     public void delete(long userId) {
@@ -78,8 +84,9 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
 
     public List<User> listOfCommonFriends(Long id, Long otherId) {
         Set<Long> commonFriends = getUserById(id).getFriends();
-        commonFriends.retainAll(getUserById(otherId).getFriends());
+        Set<Long> othersFriends = getUserById(otherId).getFriends();
         return commonFriends.stream()
+                .filter(othersFriends::contains)
                 .map(this::getUserById)
                 .toList();
     }
@@ -88,11 +95,11 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
         if (userId == otherId) throw new ValidationException("Id друга должен отличаться от id пользователя");
         Set<Long> userFriends = getUserById(userId).getFriends();
         Set<Long> otherFriends = getUserById(otherId).getFriends();
-        if (userFriends.contains(otherId)) {
-            update(CONFIRM_FRIEND_QUERY, userId, otherId);
+        if (otherFriends.contains(userId)) {
+            jdbc.update(CONFIRM_FRIEND_QUERY, userId, otherId);
             return getUserById(userId);
-        } else if (!otherFriends.contains(userId)) {
-            insert(INSERT_FRIEND_QUERY, userId, otherId);
+        } else if (!userFriends.contains(otherId)) {
+            jdbc.update(INSERT_FRIEND_QUERY, userId, otherId);
             return getUserById(userId);
         } else {
             return getUserById(userId);
@@ -103,7 +110,7 @@ public class UserDbStorage extends BaseDbStorage<User> implements UserStorage {
         Set<Long> friends = getUserById(userId).getFriends();
         getUserById(friendId);
         if (friends.contains(friendId))
-            update(DELETE_FRIEND_QUERY, userId, friendId, userId, friendId);
+            jdbc.update(DELETE_FRIEND_QUERY, userId, friendId, userId, friendId);
         return getUserById(userId);
     }
 }

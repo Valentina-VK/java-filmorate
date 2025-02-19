@@ -31,6 +31,12 @@ public class UserController {
         return userService.getUsers();
     }
 
+    @GetMapping("/{id}")
+    public UserDto getById(@Positive(message = "Id пользователя должен быть положительным числом")
+                           @PathVariable long id) {
+        return userService.getUserById(id);
+    }
+
     @PostMapping
     public UserDto create(@Valid @RequestBody NewUserRequest user) {
         return userService.createUser(user);

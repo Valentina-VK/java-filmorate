@@ -11,7 +11,7 @@ import java.time.LocalDate;
 
 @Data
 public class UpdateUserRequest {
-    private long id;
+    private Long id;
     @NotNull(message = "Email должен быть заполнен")
     @Email(message = "Email должен быть корректным")
     private String email;

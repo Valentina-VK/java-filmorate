@@ -36,10 +36,10 @@ public class FilmDbStorageTest {
         testFilm.setDescription("Description for TestFilm");
         testFilm.setReleaseDate(LocalDate.parse("1919-09-19"));
         testFilm.setDuration(100);
-        RatingMpa mpa = new RatingMpa(1,"");
+        RatingMpa mpa = new RatingMpa(1L,"");
         testFilm.setRatingMpa(mpa);
-        Genre genreOne = new Genre(1,"");
-        Genre genreTwo = new Genre(3,"");
+        Genre genreOne = new Genre(1L,"");
+        Genre genreTwo = new Genre(3L,"");
         testFilm.setGenres(Set.of(genreOne, genreTwo));
     }
 
@@ -84,6 +84,7 @@ public class FilmDbStorageTest {
 
         assertThat(likedFilm).isNotNull();
         assertThat(likedFilm.getId()).isEqualTo(5L);
+
         assertThat(likedFilm.getLikes()).hasSize(1);
         assertThat(likedFilm.getLikes()).contains(1L);
     }

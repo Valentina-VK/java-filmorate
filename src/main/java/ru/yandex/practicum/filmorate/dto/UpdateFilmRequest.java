@@ -14,7 +14,7 @@ import java.util.Set;
 
 @Data
 public class UpdateFilmRequest {
-    private long id;
+    private Long id;
     @NotBlank(message = "Название фильма не может быть пустым")
     private String name;
     @Size(max = 200, message = "максимальная длина описания — 200 символов")
